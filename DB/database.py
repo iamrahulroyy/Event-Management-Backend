@@ -119,19 +119,28 @@ class EVENT_DB:
                 elif "organizer_name" in data:
                     statement = select(Event).filter(Event.organizer_name == data.get("organizer_name"))
                     table = db_pool.exec(statement).all()
-            
+                if "event_id" in data:
+                    statement = select(Event).filter(Event.event_id == data.get("event_id"))
+                    table = db_pool.exec(statement).first()
+                elif "id" in data:
+                    statement = select(Event).filter(Event.id == data.get("id"))
+                    table = db_pool.exec(statement).first()
+
             elif dbClassNam == TableNameEnum.RSVP:
-                statement = select(RSVP).filter(RSVP.event_id == data.get("event_id"))
-                # print(f"SQL Statement: {str(statement)}")  
-                table = db_pool.exec(statement).all()  
-                # print(f"Query result for RSVP: {table}") 
-            
+                query = select(RSVP)
+                if data:
+                    if "event_id" in data:
+                        query = query.filter(RSVP.event_id == data.get("event_id"))
+                    if "username" in data:
+                        query = query.filter(RSVP.username == data.get("username"))
+                table = db_pool.exec(query).all()
+
             return table
 
         except Exception as e:
             print(f"Error executing query: {str(e)}")
             if isinstance(db_pool, Session):
-                db_pool.rollback()  # Ensure rollback in case of error
+                db_pool.rollback()  
             return None, False
 
 

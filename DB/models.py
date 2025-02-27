@@ -1,5 +1,6 @@
 from enum import Enum
 import time
+import uuid
 from sqlalchemy import Column, Integer, func
 from sqlmodel import SQLModel, Field
 from typing import Optional
@@ -16,6 +17,7 @@ class TableNameEnum(str, Enum):
 class rsvpenum(str, Enum):
     ACCEPTED = "accepted"
     DECLINED = "declined"
+    PENDING = "pending"
 
 class ORGANIZER_METAReasonEnum(str, Enum):
     SIGNUP = "signup" 
@@ -75,6 +77,7 @@ class RSVP(SQLModel, table=True):
     event_id: int  = Field(foreign_key="event.id")
     username: str
     title : str
+    token: str = Field(default_factory=lambda: str(uuid.uuid4()))
     # email: Optional[str]
     # contact: Optional[int]
     status: rsvpenum = Field(default=rsvpenum.DECLINED)  
